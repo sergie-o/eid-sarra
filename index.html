@@ -24,25 +24,28 @@
       --panel-border: rgba(212, 175, 55, 0.25);
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       min-height: 100vh;
-      overflow: hidden;
       font-family: "Georgia", serif;
       background:
         radial-gradient(circle at top, rgba(212, 175, 55, 0.16), transparent 30%),
         linear-gradient(160deg, var(--bg-1), var(--bg-2), var(--bg-3));
       color: var(--text-main);
-      display: flex;
-      justify-content: center;
-      align-items: center;
       position: relative;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .background-stars,
     .floating-hearts,
     .sparkles-layer,
     .confetti-layer {
-      position: absolute;
+      position: fixed;
       inset: 0;
       pointer-events: none;
     }
@@ -72,7 +75,7 @@
     }
 
     .moon {
-      position: absolute;
+      position: fixed;
       top: 70px;
       right: 110px;
       width: 120px;
@@ -81,6 +84,7 @@
       background: #e7cf85;
       box-shadow: 0 0 50px rgba(212, 175, 55, 0.32);
       z-index: 0;
+      pointer-events: none;
     }
 
     .moon::after {
@@ -97,7 +101,7 @@
     }
 
     .sound-toggle {
-      position: absolute;
+      position: fixed;
       top: 18px;
       left: 18px;
       z-index: 40;
@@ -116,9 +120,10 @@
       position: relative;
       z-index: 2;
       width: min(92%, 780px);
+      margin: 120px auto 80px;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
     }
 
     .gift-scene {
@@ -292,6 +297,7 @@
     .loading-card {
       position: relative;
       width: min(92vw, 760px);
+      max-width: 760px;
       padding: 46px 30px 34px;
       border-radius: 30px;
       background: var(--panel);
@@ -305,7 +311,7 @@
     }
 
     .reveal-card {
-      position: absolute;
+      display: none;
       opacity: 0;
       transform: scale(0.85) translateY(35px);
       pointer-events: none;
@@ -313,6 +319,7 @@
     }
 
     .reveal-card.show {
+      display: block;
       opacity: 1;
       transform: scale(1) translateY(0);
       pointer-events: auto;
@@ -506,7 +513,7 @@
     }
 
     .burst {
-      position: absolute;
+      position: fixed;
       width: 10px;
       height: 10px;
       border-radius: 50%;
@@ -514,6 +521,7 @@
       box-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
       animation: burstUp 1.4s ease forwards;
       opacity: 0.9;
+      pointer-events: none;
     }
 
     @keyframes burstUp {
@@ -531,13 +539,14 @@
     }
 
     .confetti {
-      position: absolute;
+      position: fixed;
       width: 10px;
       height: 18px;
       border-radius: 4px;
       background: var(--gold-1);
       animation: confettiFall 2.4s linear forwards;
       opacity: 0.9;
+      pointer-events: none;
     }
 
     @keyframes confettiFall {
@@ -552,7 +561,7 @@
     }
 
     .lantern {
-      position: absolute;
+      position: fixed;
       bottom: -80px;
       width: 26px;
       height: 40px;
@@ -561,6 +570,7 @@
       box-shadow: 0 0 24px rgba(212, 175, 55, 0.35);
       animation: floatUp linear infinite;
       opacity: 0.5;
+      pointer-events: none;
     }
 
     .lantern::before {
@@ -590,16 +600,17 @@
 
     .loading-overlay,
     .game-overlay {
-      position: absolute;
+      position: fixed;
       inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 12;
+      z-index: 50;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.5s ease;
       background: rgba(5, 5, 5, 0.35);
+      padding: 24px 12px;
     }
 
     .loading-overlay.show,
@@ -623,19 +634,6 @@
       font-size: 1.02rem;
       line-height: 1.8;
       min-height: 32px;
-    }
-
-    .loading-dots::after {
-      content: "";
-      animation: dots 1.3s steps(4, end) infinite;
-    }
-
-    @keyframes dots {
-      0% { content: ""; }
-      25% { content: "."; }
-      50% { content: ".."; }
-      75% { content: "..."; }
-      100% { content: ""; }
     }
 
     .game-title {
@@ -823,11 +821,11 @@
     }
 
     .flying-money {
-      position: absolute;
+      position: fixed;
       font-size: 1.1rem;
       pointer-events: none;
       animation: flyToBank 0.9s ease forwards;
-      z-index: 20;
+      z-index: 60;
     }
 
     @keyframes flyToBank {
@@ -972,11 +970,15 @@
       .bank-money {
         font-size: 1.7rem;
       }
+
+      .container {
+        margin: 100px auto 60px;
+      }
     }
   </style>
 </head>
 <body>
-  <button class="sound-toggle" id="soundToggle" onclick="toggleSound()">🔊 Sound On</button>
+  <button class="sound-toggle" id="soundToggle" onclick="toggleSound()">🔇 Sound Off</button>
 
   <div class="background-stars" id="stars"></div>
   <div class="sparkles-layer" id="sparkles"></div>
@@ -1066,7 +1068,7 @@
     <div class="loading-card">
       <div class="loading-label">Sara Bank Secure Access ✨</div>
       <div class="loading-title">Preparing your Eid vault</div>
-      <div class="loading-line loading-dots" id="loadingLine">Connecting to Sara Bank</div>
+      <div class="loading-line" id="loadingLine">Connecting to Sara Bank</div>
     </div>
   </div>
 
@@ -1124,47 +1126,11 @@ May your day be filled with warmth, laughter, and all the good things your heart
     let totalReward = 0;
     let selectedCurrency = "EUR";
     let moonSpawner = null;
-    let soundOn = true;
-
-    let audioCtx;
-    function ensureAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioCtx.state === "suspended") {
-        audioCtx.resume();
-      }
-    }
-
-    function playTone(freq = 440, duration = 0.12, type = "sine", volume = 0.03) {
-      if (!soundOn) return;
-      ensureAudio();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = type;
-      osc.frequency.value = freq;
-      gain.gain.value = volume;
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + duration);
-    }
-
-    function playGiftSound() {
-      playTone(520, 0.12, "triangle", 0.035);
-      setTimeout(() => playTone(680, 0.14, "triangle", 0.035), 120);
-    }
-
-    function playWinSound() {
-      playTone(520, 0.12, "sine", 0.03);
-      setTimeout(() => playTone(660, 0.12, "sine", 0.03), 120);
-      setTimeout(() => playTone(820, 0.18, "sine", 0.03), 240);
-    }
+    let soundOn = false;
 
     function toggleSound() {
       soundOn = !soundOn;
       document.getElementById("soundToggle").textContent = soundOn ? "🔊 Sound On" : "🔇 Sound Off";
-      if (soundOn) ensureAudio();
     }
 
     function vibratePattern(pattern) {
@@ -1207,7 +1173,6 @@ May your day be filled with warmth, laughter, and all the good things your heart
       const loadingOverlay = document.getElementById("loadingOverlay");
 
       wrapper.classList.add("gift-opened");
-      playGiftSound();
       vibratePattern([120, 40, 120]);
       createBurst();
 
@@ -1290,7 +1255,6 @@ May your day be filled with warmth, laughter, and all the good things your heart
         flyMoneyToBank(moonRect.left, moonRect.top);
         updateGameProgress();
         createTapBurst(moon.offsetLeft + 20, moon.offsetTop + 20);
-        playTone(700, 0.08, "triangle", 0.025);
         vibratePattern(35);
         moon.remove();
 
@@ -1343,7 +1307,6 @@ May your day be filled with warmth, laughter, and all the good things your heart
       done.innerHTML = `Unlocked ✨<br>You saved <strong>${formatMoney(totalReward)}</strong><br>Cash out only available in the next 5 years 😄`;
       done.classList.add("show");
 
-      playWinSound();
       vibratePattern([100, 60, 100, 60, 140]);
       createBurst();
       createConfetti();
@@ -1355,6 +1318,7 @@ May your day be filled with warmth, laughter, and all the good things your heart
       setTimeout(() => {
         document.getElementById("gameOverlay").classList.remove("show");
         document.getElementById("revealCard").classList.add("show");
+        document.getElementById("revealCard").scrollIntoView({ behavior: "smooth", block: "start" });
         runCountdown();
         fillReceipt();
       }, 1600);
@@ -1430,6 +1394,7 @@ Note: Some surprises are not fully digital`;
       }
 
       typeWriter();
+      box.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     function showSurprise() {
@@ -1442,21 +1407,23 @@ Note: Some surprises are not fully digital`;
         setTimeout(createHeart, i * 110);
       }
       createConfetti(18);
+      messageBox.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     function showExtra() {
       const extraBox = document.getElementById("extraBox");
       extraBox.classList.add("show");
       createConfetti(18);
+      extraBox.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     function showFinalClue() {
       const finalClueBox = document.getElementById("finalClueBox");
       finalClueBox.classList.add("show");
-      playTone(560, 0.1, "triangle", 0.03);
       for (let i = 0; i < 12; i++) {
         setTimeout(createHeart, i * 100);
       }
+      finalClueBox.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     function createHeart() {
@@ -1477,8 +1444,8 @@ Note: Some surprises are not fully digital`;
       for (let i = 0; i < 28; i++) {
         const burst = document.createElement("div");
         burst.classList.add("burst");
-        burst.style.left = "50%";
-        burst.style.top = "50%";
+        burst.style.left = "50vw";
+        burst.style.top = "50vh";
 
         const angle = Math.random() * Math.PI * 2;
         const distance = 80 + Math.random() * 140;
